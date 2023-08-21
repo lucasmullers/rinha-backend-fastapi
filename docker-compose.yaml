@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  db:
+    build: postgres
+    # image: blog_postgres-13-alpine-multi-user
+    volumes:
+      - $HOME/.postgres/rinha/data/postgresql:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DBS=rinha
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DB__uri: "postgresql://postgres:postgres@db:5432/rinha"
+      DB__connect_args: "{}"
+    volumes:
+      - .:/home/app/api
+    depends_on:
+      - db
+    stdin_open: true
+    tty: true
