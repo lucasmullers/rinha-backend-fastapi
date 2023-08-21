@@ -2,10 +2,9 @@ version: '3.9'
 
 services:
   db:
-    build: postgres
-    # image: blog_postgres-13-alpine-multi-user
+    image: postgres
     volumes:
-      - $HOME/.postgres/rinha/data/postgresql:/var/lib/postgresql/data
+      - ./postgres/:/docker-entrypoint-initdb.d/
     ports:
       - "5432:5432"
     environment:
