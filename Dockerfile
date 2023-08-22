@@ -19,4 +19,5 @@ RUN chown -R app:app $APP_HOME
 USER app
 
 # CMD ["uvicorn", "blog.app:app", "--host=0.0.0.0", "--port=8000", "--reload", "--log-level", "debug"]
-CMD ["/bin/bash", "-c", "python3 main.py"]
+# CMD ["/bin/bash", "-c", "python3 main.py"]
+CMD ["/bin/bash", "-c", "gunicorn main:app -w 2 -k uvicorn.workers.UvicornWorker -b '0.0.0.0:80'"]

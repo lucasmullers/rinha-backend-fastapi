@@ -7,7 +7,6 @@ events {
 http {
     upstream api {
         server api1:80;
-        server api2:90;
     }
     server {
         listen 9999;
