@@ -36,13 +36,13 @@ async def get_pessoa(id: str, db: AsyncSession = Depends(get_session)):
 
 
 @router.get("/", response_model=List[PessoasModel], status_code=status.HTTP_200_OK)
-async def get_by_term(term: str, db: AsyncSession = Depends(get_session)):
+async def get_by_term(t: str, db: AsyncSession = Depends(get_session)):
     async with db as session:
         result = await session.execute(select(PessoasModel).filter(
             or_(
-                PessoasModel.apelido.ilike(f"%{term}%"),
-                PessoasModel.nome.ilike(f"%{term}%"),
-                func.array_to_string(PessoasModel.stack, ",").ilike(f"%{term}%"),
+                PessoasModel.apelido.ilike(f"%{t}%"),
+                PessoasModel.nome.ilike(f"%{t}%"),
+                func.array_to_string(PessoasModel.stack, ",").ilike(f"%{t}%"),
             )).limit(50))
 
         pessoas: List[PessoasModel] = result.scalars().all()
