@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  db:
+  db: # Banco de dados
     image: postgres
     volumes:
       - ./postgres/:/docker-entrypoint-initdb.d/
@@ -11,13 +11,19 @@ services:
       - POSTGRES_DBS=rinha
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '1.1'
+          memory: '2.2GB'
 
-  api:
+  api1: # API - Instância 01
     build:
       context: .
       dockerfile: Dockerfile
+    hostname: api1
     ports:
-      - "8000:8000"
+      - "80:80"
     environment:
       DB__uri: "postgresql://postgres:postgres@db:5432/rinha"
       DB__connect_args: "{}"
@@ -27,3 +33,45 @@ services:
       - db
     stdin_open: true
     tty: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '0.15GB'
+
+  api2: # API - Instância 02
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "90:90"
+    hostname: api2
+    environment:
+      DB__uri: "postgresql://postgres:postgres@db:5432/rinha"
+      DB__connect_args: "{}"
+    volumes:
+      - .:/home/app/api
+    depends_on:
+      - db
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: '0.15GB'
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx:/docker-entrypoint.d/
+    depends_on:
+      - api1
+      - api2
+    ports:
+      - "9999:9999"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '0.5GB'
